@@ -23,13 +23,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Implements testing of the CarController class.
@@ -83,6 +83,22 @@ public class CarControllerTest {
     }
 
     /**
+     * Tests the update of a single car by ID.
+     *
+     * @throws Exception if the update operation of a vehicle fails
+     */
+    @Test
+    public void updateCar() throws Exception {
+        Car car = getCar();
+        car.setCondition(Condition.NEW);
+        mvc.perform(put("/cars/1")
+                .content(json.write(car).getJson())
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk());
+    }
+
+    /**
      * Tests if the read operation appropriately returns a list of vehicles.
      *
      * @throws Exception if the read operation of the vehicle list fails
@@ -94,11 +110,18 @@ public class CarControllerTest {
          *   the whole list of vehicles. This should utilize the car from `getCar()`
          *   below (the vehicle will be the first in the list).
          */
+        Car car = getCar();
         mvc.perform(get("/cars"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(new MediaType("application", "*+json")))
-                .andExpect(content().json("{}"));
-
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{}"))
+                .andExpect(jsonPath("_embedded.carList[0].condition", is(car.getCondition().name())))
+                .andExpect(jsonPath("_embedded.carList[0].location.lat", is(car.getLocation().getLat())))
+                .andExpect(jsonPath("_embedded.carList[0].location.lon", is(car.getLocation().getLon())))
+                .andExpect(jsonPath("_embedded.carList[0].details.body", is(car.getDetails().getBody())))
+                .andExpect(jsonPath("_embedded.carList[0].details.numberOfDoors", is(car.getDetails().getNumberOfDoors())))
+                .andExpect(jsonPath("_embedded.carList[0].details.fuelType", is(car.getDetails().getFuelType())))
+                .andExpect(jsonPath("_embedded.carList[0].details.engine", is(car.getDetails().getEngine())));
         verify(carService, times(1)).list();
     }
 
@@ -113,11 +136,18 @@ public class CarControllerTest {
          * TODO: Add a test to check that the `get` method works by calling
          *   a vehicle by ID. This should utilize the car from `getCar()` below.
          */
+        Car car = getCar();
         mvc.perform(get("/cars/1"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(new MediaType("application", "*+json")))
-                .andExpect(content().json("{}"));
-
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{}"))
+                .andExpect(jsonPath("condition", is(car.getCondition().name())))
+                .andExpect(jsonPath("location.lat", is(car.getLocation().getLat())))
+                .andExpect(jsonPath("location.lon", is(car.getLocation().getLon())))
+                .andExpect(jsonPath("details.body", is(car.getDetails().getBody())))
+                .andExpect(jsonPath("details.numberOfDoors", is(car.getDetails().getNumberOfDoors())))
+                .andExpect(jsonPath("details.fuelType", is(car.getDetails().getFuelType())))
+                .andExpect(jsonPath("details.engine", is(car.getDetails().getEngine())));
         verify(carService, times(1)).findById(1L);
     }
 
@@ -135,28 +165,7 @@ public class CarControllerTest {
          */
         mvc.perform(delete("/cars/1"))
                 .andExpect(status().isNoContent());
-
         verify(carService, times(1)).delete(1L);
-    }
-
-    /**
-     * Tests the update of a single car by ID.
-     *
-     * @throws Exception if the update operation of a vehicle fails
-     */
-    @Test
-    public void updateCar() throws Exception {
-
-        Car car = getCar();
-        car.setCondition(Condition.NEW);
-
-        mvc.perform(put("/cars/1")
-                .content(json.write(car).getJson())
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk());
-
-
     }
 
     /**

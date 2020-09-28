@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,8 @@ public class CarController {
      * Creates a list to store any vehicles.
      * @return list of vehicles
      */
-    @GetMapping
+    @GetMapping(produces = "application/json; charset=UTF-8")
+    @ApiOperation(value = "Get all cars", notes = "This method gets all saved cars")
     Resources<Resource<Car>> list() {
         List<Resource<Car>> resources = carService.list().stream().map(assembler::toResource)
                 .collect(Collectors.toList());
@@ -56,7 +58,8 @@ public class CarController {
      * @param id the id number of the given vehicle
      * @return all information for the requested vehicle
      */
-    @GetMapping("/{id}")
+    @GetMapping(value ="/{id}", produces = "application/json; charset=UTF-8")
+    @ApiOperation(value = "Get a car by ID", notes = "This method gets a saved car by ID")
     Resource<Car> get(@PathVariable Long id) {
         /**
          * TODO: Use the `findById` method from the Car Service to get car information.
@@ -74,6 +77,7 @@ public class CarController {
      * @throws URISyntaxException if the request contains invalid fields or syntax
      */
     @PostMapping
+    @ApiOperation(value = "Create a new car", notes = "This method creates a new car")
     ResponseEntity<?> post(@Valid @RequestBody Car car) throws URISyntaxException {
         /**
          * TODO: Use the `save` method from the Car Service to save the input car.
@@ -92,7 +96,8 @@ public class CarController {
      * @param car The updated information about the related vehicle.
      * @return response that the vehicle was updated in the system
      */
-    @PutMapping("/{id}")
+    @PutMapping(value ="/{id}")
+    @ApiOperation(value = "Update a car by ID", notes = "This method updates a saved car by ID")
     ResponseEntity<?> put(@PathVariable Long id, @Valid @RequestBody Car car) throws URISyntaxException {
         /**
          * TODO: Set the id of the input car object to the `id` input.
@@ -113,6 +118,7 @@ public class CarController {
      * @return response that the related vehicle is no longer in the system
      */
     @DeleteMapping("/{id}")
+    @ApiOperation(value = "Delete a car by ID", notes = "This method deletes a saved car by ID")
     ResponseEntity<?> delete(@PathVariable Long id) {
         /**
          * TODO: Use the Car Service to delete the requested vehicle.

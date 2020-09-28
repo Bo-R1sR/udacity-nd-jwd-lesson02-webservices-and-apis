@@ -16,11 +16,6 @@ import java.util.Collections;
 
 @Configuration
 @EnableSwagger2
-@ApiResponses(value = {
-        @ApiResponse(code=400, message = "This is a bad request, please follow the API documentation for the proper request format."),
-        @ApiResponse(code=401, message = "Due to security constraints, your access request cannot be authorized. "),
-        @ApiResponse(code=500, message = "The server is down. Please make sure that the Location microservice is running.")
-})
 public class SwaggerConfig {
     @Bean
     public Docket api() {
@@ -28,18 +23,16 @@ public class SwaggerConfig {
                 .select()
                 .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
-                .build()
-                .useDefaultResponseMessages(false);
+                .build();
     }
 
     private ApiInfo apiInfo() {
         return new ApiInfo(
-                "Location API",
-                "This API returns a list of airport locations.",
+                "Vehicle REST API",
+                "This API returns information about vehicles.",
                 "1.0",
                 "http://www.udacity.com/tos",
-                new Contact("Kesha Williams", "www.udacity.com", "myeaddress@udacity.com"),
+                new Contact("VehicleAPI", "www.vehicle.com", "myeaddress@udacity.com"),
                 "License of API", "http://www.udacity.com/license", Collections.emptyList());
     }
-
 }
